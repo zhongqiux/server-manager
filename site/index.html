@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>科研 GPU 调度台 · 多服务器实验调度</title>
   <script>document.documentElement.classList.add('js');</script>
-  <meta name="description" content="把散落的 GPU 服务器收进一个本地调度台：统一 SSH 接入、SFTP/Git 增量同步、tmux/screen 会话运行、实时日志与 GPU 监控。Windows 单文件，数据不出本机。" />
+  <meta name="description" content="把散落的 GPU 服务器收进一个本地调度台：统一 SSH 接入、SFTP/Git 增量同步、tmux/screen 会话运行、实时日志与 GPU 监控。Windows / macOS 单文件，数据不出本机。" />
   <meta property="og:title" content="科研 GPU 调度台 · 多服务器实验调度" />
   <meta property="og:description" content="一眼看到哪张 GPU 空闲，一键增量同步代码，在 tmux / screen 中安全运行，实时读日志。" />
   <meta property="og:type" content="website" />
@@ -51,7 +51,7 @@
         <a href="#faq">常见问题</a>
       </nav>
       <div class="header-actions">
-        <a class="btn btn-primary btn-sm" href="#download" data-download>
+        <a class="btn btn-primary btn-sm" href="#download">
           <svg class="icon"><use href="#i-download"/></svg><span data-download-label>下载</span>
         </a>
         <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false" aria-controls="site-nav">
@@ -65,18 +65,18 @@
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-copy reveal">
-          <p class="eyebrow"><span class="pulse-dot"></span>本地单用户 · Windows 单文件 · 无需登录</p>
+          <p class="eyebrow"><span class="pulse-dot"></span>本地单用户 · Windows / macOS 单文件 · 无需登录</p>
           <h1><span class="hero-line">把散落的 GPU 服务器</span><br /><span class="grad">收进一个调度台。</span></h1>
           <p class="lead">换机器不用换命令，传代码不再手写 rsync。统一 SSH 接入、增量同步、tmux / screen 会话运行与实时日志，让实验从代码到结果只走一条路径。</p>
           <div class="hero-actions">
-            <a class="btn btn-primary btn-lg" href="#download" data-download>
-              <svg class="icon"><use href="#i-download"/></svg><span data-download-label>下载 Windows 版</span>
+            <a class="btn btn-primary btn-lg" href="#download">
+              <svg class="icon"><use href="#i-download"/></svg><span>下载桌面版</span>
             </a>
             <a class="btn btn-secondary btn-lg" href="#guide">查看使用指南<svg class="icon"><use href="#i-arrow"/></svg></a>
           </div>
           <ul class="hero-meta">
-            <li><svg class="icon"><use href="#i-monitor"/></svg><span data-site-os>Windows 10/11（x64）</span></li>
-            <li><svg class="icon"><use href="#i-layers"/></svg><span data-site-size>约 85 MB</span></li>
+            <li><svg class="icon"><use href="#i-monitor"/></svg><span data-site-os>Windows 10/11 · macOS</span></li>
+            <li><svg class="icon"><use href="#i-layers"/></svg><span data-site-size>Windows 约 97 MB · macOS 约 41 MB</span></li>
             <li><svg class="icon"><use href="#i-check"/></svg>不需要安装 Node.js</li>
           </ul>
         </div>
@@ -320,7 +320,7 @@
               <span class="step-num">01</span>
               <div class="step-body">
                 <h3>运行程序</h3>
-                <p>下载 <code>ServerManager.exe</code>，放到任意目录双击。浏览器会自动打开本地界面，数据默认保存在 <code>%LOCALAPPDATA%\ServerManager\data</code>。</p>
+                <p>Windows 下载 <code>ServerManager.exe</code> 双击运行；macOS 解压后执行 <code>chmod +x ServerManager &amp;&amp; ./ServerManager</code>。浏览器会自动打开本地界面，数据保存在系统应用数据目录。</p>
                 <div class="note-row"><span class="note-chip">免安装</span><span class="note-chip">单实例</span><span class="note-chip">重启后数据保留</span></div>
               </div>
             </li>
@@ -357,12 +357,16 @@
               <p>exe 未做代码签名。点击「更多信息 → 仍要运行」即可；分发时可附带 SHA256 供校验。</p>
             </div>
             <div class="side-item">
+              <b>macOS 首次打开被拦截</b>
+              <p>包为 ad-hoc 签名、未公证。右键选择“打开”，或在终端执行 <code>xattr -dr com.apple.quarantine ServerManager</code>。</p>
+            </div>
+            <div class="side-item">
               <b>没有服务器，也想先看看</b>
-              <p>打开命令提示符执行 <code>set SM_DEMO=1 &amp;&amp; ServerManager.exe</code>，会载入合成的服务器、GPU 与任务数据。</p>
+              <p>Windows：<code>set SM_DEMO=1 &amp;&amp; ServerManager.exe</code>；macOS：<code>SM_DEMO=1 ./ServerManager</code>。会载入合成的服务器、GPU 与任务数据。</p>
             </div>
             <div class="side-item">
               <b>U 盘或便携使用</b>
-              <p>使用 <code>ServerManager.exe --portable</code>，数据会写在 exe 同目录的 <code>data\</code>，连同程序一起带走。</p>
+              <p>使用 <code>--portable</code>，数据会写在可执行文件同目录的 <code>data/</code>，连同程序一起带走。</p>
             </div>
             <div class="side-item">
               <b>从源码运行</b>
@@ -378,22 +382,30 @@
         <div class="download-card reveal">
           <div class="download-glow" aria-hidden="true"></div>
           <div class="download-copy">
-            <p class="eyebrow"><span class="pulse-dot"></span>Windows 单文件 · 约 85 MB</p>
+            <p class="eyebrow"><span class="pulse-dot"></span>Windows / macOS 单文件 · 无需安装 Node.js</p>
             <h2>把下一轮实验，<br />交给调度台。</h2>
-            <p>不注册、不上传、不依赖云服务。下载后双击即用，连上你的第一台服务器。</p>
+            <p>不注册、不上传、不依赖云服务。选择你的系统，下载后即可连接第一台服务器。</p>
             <ul class="download-meta">
               <li><span>版本</span><b data-site-version>v0.1.0</b></li>
-              <li><span>平台</span><b data-site-os>Windows 10 / 11（x64）</b></li>
-              <li><span>大小</span><b data-site-size>约 85 MB</b></li>
+              <li><span>平台</span><b data-site-os>Windows 10 / 11 · macOS</b></li>
+              <li><span>大小</span><b data-site-size>Windows 约 97 MB · macOS 压缩包约 41 MB</b></li>
             </ul>
-            <p class="download-hash" data-download-hash hidden><span>SHA256</span><code></code></p>
+            <p class="download-hash" data-download-checksums hidden><span>校验</span><a href="#" data-checksums-link target="_blank" rel="noopener noreferrer">SHA256SUMS.txt</a></p>
           </div>
           <div class="download-action">
-            <a class="btn btn-primary btn-xl" href="#download" data-download>
-              <svg class="icon"><use href="#i-download"/></svg><span data-download-label>下载 Windows 版</span>
-            </a>
-            <p class="download-pending" data-download-pending>下载链接即将开放，发布后会在这里更新网盘地址。</p>
-            <p class="download-alt">不会安装 Node.js，也不会修改系统环境变量。</p>
+            <div class="download-buttons">
+              <a class="btn btn-primary btn-xl" href="#download" data-download-platform="windows">
+                <svg class="icon"><use href="#i-download"/></svg><span>下载 Windows 版</span>
+              </a>
+              <a class="btn btn-secondary btn-lg" href="#download" data-download-platform="macArm64">
+                <svg class="icon"><use href="#i-download"/></svg><span>macOS · Apple Silicon</span>
+              </a>
+              <a class="btn btn-secondary btn-lg" href="#download" data-download-platform="macX64">
+                <svg class="icon"><use href="#i-download"/></svg><span>macOS · Intel</span>
+              </a>
+            </div>
+            <p class="download-pending" data-download-pending>下载链接即将开放，发布后会在这里更新。</p>
+            <p class="download-alt">macOS 包为 ad-hoc 签名，首次打开需右键“打开”。</p>
           </div>
         </div>
       </div>
@@ -428,11 +440,11 @@
           </details>
           <details class="reveal">
             <summary>数据存放在哪里？换电脑怎么办？</summary>
-            <p>默认在 <code>%LOCALAPPDATA%\ServerManager\data</code>，包含数据库、密钥与临时文件；使用 <code>--portable</code> 时写在 exe 同目录的 <code>data\</code>。迁移时复制整个数据目录即可，但请一并保留 <code>keys\</code>，否则已加密的凭据无法解密。</p>
+            <p>Windows 默认在 <code>%LOCALAPPDATA%\ServerManager\data</code>，macOS 默认在 <code>~/Library/Application Support/ServerManager/data</code>，包含数据库、密钥与临时文件；使用 <code>--portable</code> 时写在可执行文件同目录的 <code>data/</code>。迁移时复制整个数据目录即可，但请一并保留 <code>keys/</code>，否则已加密的凭据无法解密。</p>
           </details>
           <details class="reveal">
             <summary>支持 macOS / Linux 吗？</summary>
-            <p>目前只发布 Windows x64 单文件版。项目本身是 TypeScript + Node.js 全栈应用，源码可以在 macOS / Linux 上构建运行，但尚未提供对应安装包。</p>
+            <p>Windows x64 与 macOS（Apple Silicon / Intel）均提供单文件包；macOS 包为 ad-hoc 签名、未公证，首次打开需右键“打开”。Linux 可从源码构建运行。</p>
           </details>
           <details class="reveal">
             <summary>MCP 是什么？必须安装吗？</summary>

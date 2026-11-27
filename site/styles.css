@@ -339,6 +339,19 @@ code {
   box-shadow: none;
 }
 
+.btn-secondary.is-pending {
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--line);
+  cursor: default;
+}
+
+.btn-secondary.is-pending:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--line);
+}
+
 /* ---------- hero ---------- */
 
 .hero {
@@ -1470,6 +1483,23 @@ code {
 .download-hash code {
   font-size: 10px;
   word-break: break-all;
+}
+
+.download-hash a {
+  color: var(--emerald);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.download-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.download-buttons .btn {
+  width: 100%;
 }
 
 .download-action {

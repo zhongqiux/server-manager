@@ -1,10 +1,13 @@
 // 发布前只需要改这一个文件。
-// downloadUrl 填入网盘直链或分享页地址后，页面上的所有“下载”按钮会自动启用。
-// 例：downloadUrl: 'https://pan.baidu.com/s/xxxxxxxx'
+// downloads 填入 GitHub Release 资产直链，留空时对应按钮显示为待发布。
 window.SM_SITE = {
-  downloadUrl: '',
+  downloads: {
+    windows: 'https://github.com/zhongqiux/server-manager/releases/latest/download/ServerManager-windows-x64.exe',
+    macArm64: 'https://github.com/zhongqiux/server-manager/releases/latest/download/ServerManager-macos-arm64.tar.gz',
+    macX64: 'https://github.com/zhongqiux/server-manager/releases/latest/download/ServerManager-macos-x64.tar.gz',
+  },
+  checksumsUrl: 'https://github.com/zhongqiux/server-manager/releases/latest/download/SHA256SUMS.txt',
   version: 'v0.1.0',
-  size: '约 85 MB',
-  os: 'Windows 10 / 11（x64）',
-  sha256: '',
+  size: 'Windows 约 97 MB · macOS 压缩包约 41 MB',
+  os: 'Windows 10 / 11 · macOS（ARM / Intel）',
 };

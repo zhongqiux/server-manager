@@ -2,7 +2,14 @@
   'use strict';
 
   const cfg = window.SM_SITE || {};
-  const downloadUrl = typeof cfg.downloadUrl === 'string' ? cfg.downloadUrl.trim() : '';
+  const downloads = cfg.downloads || {};
+  const legacyDownloadUrl = typeof cfg.downloadUrl === 'string' ? cfg.downloadUrl.trim() : '';
+
+  function platformUrl(key) {
+    const value = downloads[key];
+    if (typeof value === 'string' && value.trim()) return value.trim();
+    return key === 'windows' ? legacyDownloadUrl : '';
+  }
 
   function textAll(selector, value) {
     if (!value) return;
@@ -15,32 +22,36 @@
   textAll('[data-site-os]', cfg.os);
   textAll('[data-site-size]', cfg.size);
 
-  const hashEl = document.querySelector('[data-download-hash]');
-  if (hashEl && cfg.sha256) {
-    hashEl.hidden = false;
-    const code = hashEl.querySelector('code');
-    if (code) code.textContent = cfg.sha256;
+  const checksumsEl = document.querySelector('[data-download-checksums]');
+  const checksumsLink = document.querySelector('[data-checksums-link]');
+  const checksumsUrl = typeof cfg.checksumsUrl === 'string' ? cfg.checksumsUrl.trim() : '';
+  if (checksumsEl && checksumsLink && checksumsUrl) {
+    checksumsLink.setAttribute('href', checksumsUrl);
+    checksumsEl.hidden = false;
   }
 
   const pendingNote = document.querySelector('[data-download-pending]');
-  document.querySelectorAll('[data-download]').forEach(function (link) {
-    if (downloadUrl) {
-      link.setAttribute('href', downloadUrl);
+  let hasAnyDownload = false;
+  document.querySelectorAll('[data-download-platform]').forEach(function (link) {
+    const url = platformUrl(link.getAttribute('data-download-platform') || '');
+    if (url) {
+      hasAnyDownload = true;
+      link.setAttribute('href', url);
       link.setAttribute('target', '_blank');
       link.setAttribute('rel', 'noopener noreferrer');
       link.classList.remove('is-pending');
       link.removeAttribute('aria-disabled');
-    } else {
-      link.classList.add('is-pending');
-      link.setAttribute('aria-disabled', 'true');
-      link.addEventListener('click', function (event) {
-        event.preventDefault();
-        const section = document.getElementById('download');
-        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+      return;
     }
+    link.classList.add('is-pending');
+    link.setAttribute('aria-disabled', 'true');
+    link.addEventListener('click', function (event) {
+      event.preventDefault();
+      const section = document.getElementById('download');
+      if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   });
-  if (pendingNote) pendingNote.hidden = Boolean(downloadUrl);
+  if (pendingNote) pendingNote.hidden = hasAnyDownload;
 
   const header = document.querySelector('.site-header');
   function onScroll() {
