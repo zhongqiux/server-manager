@@ -1,0 +1,18 @@
+{
+  "name": "@sm/mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Server Manager 的 MCP stdio 服务",
+  "bin": {
+    "sm-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@sm/shared": "*",
+    "zod": "^3.25.0"
+  }
+}
