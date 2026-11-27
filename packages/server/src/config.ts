@@ -25,6 +25,9 @@ export const CLI = {
 
 function packagedDataDir(): string {
   if (CLI.portable) return path.join(path.dirname(process.execPath), 'data');
+  if (process.platform === 'darwin') {
+    return path.join(os.homedir(), 'Library', 'Application Support', 'ServerManager', 'data');
+  }
   const base = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
   return path.join(base, 'ServerManager', 'data');
 }
@@ -45,7 +48,8 @@ export const RELAY_DIR = path.join(TMP_DIR, 'relay');
 export const WEB_DIST_DIR = path.join(SM_ROOT, 'packages', 'web', 'dist');
 
 export const PORT = Number(process.env.SM_PORT ?? CLI.port ?? 8787) || 8787;
-export const OPEN_BROWSER = CLI.open || IS_SEA || process.env.SM_OPEN === '1';
+const openEnv = process.env.SM_OPEN;
+export const OPEN_BROWSER = CLI.open || openEnv === '1' || (IS_SEA && openEnv !== '0');
 export const DEMO_MODE = process.env.SM_DEMO === '1';
 
 function envInt(name: string, fallback: number): number {

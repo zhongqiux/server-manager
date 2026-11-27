@@ -18,7 +18,7 @@
 |---|---|
 | Node.js | >= 22.18（开发与打包实测 v22.19.0） |
 | npm | 10.x（随 Node 附带即可） |
-| 操作系统 | 开发：Windows / macOS / Linux；打包单文件 exe：Windows x64 |
+| 操作系统 | 开发：Windows / macOS / Linux；单文件构建：Windows x64 / macOS arm64、x64 |
 | 远端服务器 | Linux，SSH 可达；建议安装 tmux 或 screen（自动模式二者都无时降级 nohup）；Git 模式需 git |
 
 数据存储在本地 SQLite（`node:sqlite`，实验性 API，启动时已屏蔽对应 ExperimentalWarning）。
@@ -83,6 +83,11 @@ npm start
 # 打包版 exe（配合 --portable，数据写在 exe 同目录 data\）
 $env:SM_DEMO='1'
 .\release\ServerManager.exe --portable
+```
+
+```bash
+# macOS 打包版
+SM_DEMO=1 ./release/ServerManager --portable
 ```
 
 - 演示数据只插入一次（数据库 settings 中记录 `demo.seed.v1`）；重复启动不会重复添加。
@@ -177,53 +182,70 @@ npm run mcp         # 启动 MCP stdio 服务
 - `version` / `size` / `os`：下载区展示的版本信息
 - `sha256`：可选，填入后下载区展示校验值
 
-页面截图位于 `site/assets/`，均来自演示模式的真实界面。更新 exe 后，请同步更新 `config.js` 与本文档的「当前构建记录」。
+页面截图位于 `site/assets/`，均来自演示模式的真实界面。更新二进制后，请同步更新 `config.js` 与本文档的构建记录。
 
 ---
 
-## 打包单文件 exe（Windows）
+## 打包与发布（Windows / macOS）
+
+单文件构建必须在目标系统上执行（SEA 直接注入当前 `node` 可执行文件，不支持交叉打包）：
 
 ```bash
-npm run dist:win
+npm run dist        # 当前平台；Windows 输出 release/ServerManager.exe，macOS 输出 release/ServerManager
 ```
 
-产物：`release/ServerManager.exe`。构建链：
+`npm run dist:win` / `npm run dist:mac` 是同一命令的别名。构建链：
 
 1. esbuild 将服务端（含 shared）打成单 CJS bundle（`ssh2` 的可选原生依赖 `*.node` / `cpu-features` 置为 external）
 2. `node --experimental-sea-config` 生成 SEA blob，前端 `packages/web/dist` 全部作为资源内嵌（带 asset manifest，Node 22 无 `getAssetKeys()`）
-3. 复制构建所用 `node.exe` → `release/ServerManager.exe`，用 Windows SDK 的 `signtool remove` 剥离 Node 官方签名（否则 postject 注入会因签名段校验失败），再由 postject 注入 `NODE_SEA_BLOB`
+3. 复制构建所用的 `node` 可执行文件并注入 `NODE_SEA_BLOB`
+   - Windows：先用 Windows SDK 的 `signtool remove` 剥离 Node 官方签名（否则 postject 注入会因签名段校验失败）
+   - macOS：先 `codesign --remove-signature`，注入 `NODE_SEA` 段后执行 ad-hoc 签名（`codesign --sign -`）并用 `codesign --verify` 校验
 
-构建要求：Windows x64、Node 22.x、可找到 `signtool.exe`（Windows SDK，`Program Files (x86)\Windows Kits\...` 或 PATH）。若代码缓存生成失败，脚本会自动退回 `useCodeCache: false` 重试。
+构建要求：Node >= 22.18；Windows 需要 `signtool.exe`（Windows SDK，`Program Files (x86)\Windows Kits\...` 或 PATH）；macOS 需要 Xcode Command Line Tools（`codesign`）。若代码缓存生成失败，脚本会自动退回 `useCodeCache: false` 重试。
 
-### 当前构建记录
+### GitHub Actions 自动发布
+
+[release.yml](.github/workflows/release.yml) 会在三个原生 runner 上分别构建：
+
+| 平台 | 产物 |
+|---|---|
+| Windows 10 / 11 x64 | `ServerManager-windows-x64.exe` |
+| macOS Apple Silicon | `ServerManager-macos-arm64.tar.gz` |
+| macOS Intel | `ServerManager-macos-x64.tar.gz` |
+
+- **手动运行**（Actions → Build desktop release → Run workflow）：只构建并上传 workflow artifacts，不创建 Release，可用于干跑。
+- **推送 `v*` tag**：构建、冒烟测试通过后创建 GitHub Release，附 `SHA256SUMS.txt`：
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+> 签名说明：Windows exe 未做 Authenticode 签名，SmartScreen 会提示“未知发布者”；macOS 为 ad-hoc 签名、未公证，首次打开需右键“打开”，或执行 `xattr -dr com.apple.quarantine ServerManager`。
+
+### 本地 Windows 构建记录
 
 | 项目 | 值 |
 |---|---|
-| 体积 | **84.3 MB（88,402,432 字节）** |
-| SHA256 | `4d6f8c7e3cbeb066abb4871af166d3e3b397f4e6166f3a4aaea1b48c84f1e1f0` |
+| 体积 | **84.3 MB（88,438,272 字节）** |
+| SHA256 | `e67c48c19e9c33312c3c39ecea45f21260a012c4bc96ae23fa9266603324e6db` |
 | 构建 Node | v22.19.0 |
 
-校验方式（PowerShell / cmd）：
+GitHub Release 由 CI 使用 Node 24 构建，哈希以 Release 附带的 `SHA256SUMS.txt` 为准。本地校验：`certutil -hashfile ServerManager.exe SHA256` 或 `Get-FileHash`。
 
-```powershell
-certutil -hashfile ServerManager.exe SHA256
-```
+### 运行行为
 
-或 `Get-FileHash .\ServerManager.exe -Algorithm SHA256`。
-
-> 注意：exe 未做代码签名，首次运行 Windows SmartScreen 会提示“未知发布者”，点击“更多信息 → 仍要运行”。分发时请附上上面的 sha256 供对方自校验。
-
-### exe 运行行为
-
-- 双击后在本机启动服务并**自动打开默认浏览器**；控制台窗口保留用于显示日志
+- 启动后在本机提供服务并**自动打开默认浏览器**；终端窗口保留用于显示日志
 - 数据目录：
-  - 默认：`%LOCALAPPDATA%\ServerManager\data\`（数据库、密钥、临时文件）
-  - `ServerManager.exe --portable`：数据落在 **exe 同目录的 `data\`**，适合放 U 盘携带
+  - Windows：`%LOCALAPPDATA%\ServerManager\data\`
+  - macOS：`~/Library/Application Support/ServerManager/data/`
+  - `--portable`：数据落在**可执行文件同目录的 `data/`**，适合放 U 盘携带
   - 环境变量 `SM_DATA_DIR` 可显式指定任意目录
 - 单实例：启动先探测 `http://127.0.0.1:8787/api/health`，已在运行则只打开浏览器并退出
 - 端口：`SM_PORT` 或 `--port <n>` 指定起始端口；被占用时自动向后尝试最多 20 个端口
-- 其他命令行参数：`--open` 强制打开浏览器；`--portable` 见上
-- 重启 exe 后服务器、项目、任务历史全部保留在数据目录
+- 其他命令行参数：`--open` 强制打开浏览器；`SM_OPEN=0` 禁止自动打开；`--portable` 见上
+- 重启后服务器、项目、任务历史全部保留在数据目录
 
 ---
 
@@ -232,8 +254,8 @@ certutil -hashfile ServerManager.exe SHA256
 | 变量 | 默认 | 说明 |
 |---|---|---|
 | `SM_PORT` | 8787 | 起始端口（被占用自动递增） |
-| `SM_DATA_DIR` | 开发：仓库 `data/`；exe：`%LOCALAPPDATA%\ServerManager\data` | 数据目录 |
-| `SM_OPEN` | `1` 时打开浏览器 | exe 模式总是打开 |
+| `SM_DATA_DIR` | 开发：仓库 `data/`；打包版：Windows `%LOCALAPPDATA%\ServerManager\data`、macOS `~/Library/Application Support/ServerManager/data` | 数据目录 |
+| `SM_OPEN` | 打包版默认打开浏览器 | `0` 禁止自动打开；`1` 强制打开 |
 | `SM_DEMO` | 未开启 | `1` 时载入演示数据（合成服务器/GPU/任务/日志，不连真实机器；见「演示模式」） |
 | `SM_SSH_MAX_CONCURRENCY` | 4 | SSH 全局并发上限 |
 | `SM_SFTP_FILE_CONCURRENCY` | 4 | 单目标文件传输并发 |
@@ -252,7 +274,9 @@ packages/server/    # Express 5 API、SQLite、SSH 连接池、同步引擎、�
 packages/mcp/       # stdio MCP 服务（REST 薄客户端，供 agent 接入）
 packages/web/       # React + antd 5 前端（Vite）
 site/               # 产品宣传单页（零依赖静态页面，下载链接见 site/config.js）
-scripts/build-sea.mjs  # 单文件 exe 构建链
+scripts/build-sea.mjs  # 单文件构建链（Windows / macOS）
+scripts/smoke-sea.mjs  # 打包产物冒烟测试
+.github/workflows/  # Pages 部署与桌面端 Release 构建
 ```
 
 ## 安全设计

@@ -76,7 +76,8 @@ function normalizeLocalRoot(localRoot: string): string {
   const trimmed = localRoot.trim();
   if (!trimmed) throw new ApiError(400, 'LOCAL_ROOT_INVALID', '请填写本地目录');
   if (!path.isAbsolute(trimmed)) {
-    throw new ApiError(400, 'LOCAL_ROOT_INVALID', '本地目录必须是绝对路径，例如 D:\\code\\my-project');
+    const example = process.platform === 'win32' ? 'D:\\code\\my-project' : '/Users/you/code/my-project';
+    throw new ApiError(400, 'LOCAL_ROOT_INVALID', `本地目录必须是绝对路径，例如 ${example}`);
   }
   const resolved = path.resolve(trimmed);
   let stat: fs.Stats;

@@ -1,0 +1,32 @@
+科研 GPU 调度台 · macOS 版
+============================
+
+运行
+----
+1. 解压后，在本目录打开“终端”。
+2. 首次运行先赋予执行权限：
+       chmod +x ServerManager
+3. 启动：
+       ./ServerManager
+
+服务启动后会自动打开浏览器（http://127.0.0.1:8787/）。
+终端窗口需要保持打开；按 Ctrl+C 可停止服务。
+
+数据目录
+--------
+默认：~/Library/Application Support/ServerManager/data
+使用 --portable 可将数据保存在二进制同目录的 data/ 下：
+       ./ServerManager --portable
+
+首次打开被系统拦截
+------------------
+当前版本使用 ad-hoc 签名，未经过 Apple 公证。若提示“无法验证开发者”：
+- 打开“系统设置 → 隐私与安全性”，在底部点击“仍要打开”；或
+- 在终端执行：
+       xattr -dr com.apple.quarantine ServerManager
+  然后重新运行。
+
+校验
+----
+发布页附有 SHA256SUMS.txt，可用以下命令校验：
+       shasum -a 256 ServerManager
