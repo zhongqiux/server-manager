@@ -178,9 +178,10 @@ npm run mcp         # 启动 MCP stdio 服务
 
 发布前只需修改 `site/config.js`：
 
-- `downloadUrl`：网盘分享页或直链；为空时页面上的下载按钮显示“即将开放”，填入后自动启用
-- `version` / `size` / `os`：下载区展示的版本信息
-- `sha256`：可选，填入后下载区展示校验值
+- `downloads.windows` / `downloads.macArm64` / `downloads.macX64`：填入对应平台的直链（默认指向本仓库 `releases/latest/download/` 下的固定资产名）；留空的平台按钮会显示为待发布并滚动回下载区
+- `checksumsUrl`：可选，填入后下载区展示 `SHA256SUMS.txt` 校验链接
+- `version` / `size` / `os`：下载区展示的版本信息；`size` 建议按 Release 实际产物更新
+- 兼容旧字段 `downloadUrl`：仅在 `downloads.windows` 为空时作为 Windows 下载地址使用
 
 页面截图位于 `site/assets/`，均来自演示模式的真实界面。更新二进制后，请同步更新 `config.js` 与本文档的构建记录。
 
