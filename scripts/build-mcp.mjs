@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { build } from 'esbuild';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -13,6 +13,53 @@ const IS_WIN = process.platform === 'win32';
 function fail(message) {
   console.error(`[mcp] ${message}`);
   process.exit(1);
+}
+
+function smokeTest(entry) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [entry], { stdio: ['pipe', 'pipe', 'pipe'] });
+    let stdout = '';
+    let stderr = '';
+    const timer = setTimeout(() => {
+      child.kill();
+      reject(new Error(`initialize 超时；stderr：${stderr.slice(0, 400)}`));
+    }, 12000);
+
+    const finish = (ok, detail) => {
+      clearTimeout(timer);
+      if (ok) resolve();
+      else reject(new Error(detail));
+    };
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString();
+      if (stdout.includes('"server-manager"')) {
+        child.kill();
+        finish(true);
+      }
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on('exit', (code) => {
+      if (stdout.includes('"server-manager"')) finish(true);
+      else finish(false, `initialize 失败（exit ${code}）；stderr：${stderr.slice(0, 400)}`);
+    });
+    child.on('error', (err) => finish(false, `无法启动 node：${err.message}`));
+
+    child.stdin.write(
+      `${JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'smoke', version: '0' },
+        },
+      })}\n`,
+    );
+  });
 }
 
 async function main() {
@@ -37,6 +84,9 @@ async function main() {
 
   fs.copyFileSync(path.join(ROOT, 'scripts/mcp-readme.txt'), path.join(STAGE, 'README.txt'));
   fs.copyFileSync(path.join(ROOT, 'scripts/mcp-config.example.json'), path.join(STAGE, 'mcp-config.example.json'));
+
+  console.log('[mcp] 冒烟测试 initialize 握手…');
+  await smokeTest(path.join(STAGE, 'index.js'));
 
   fs.rmSync(OUTPUT, { force: true });
   if (IS_WIN) {

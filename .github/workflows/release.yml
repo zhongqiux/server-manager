@@ -85,14 +85,6 @@ jobs:
       - name: Build MCP bundle
         run: npm run dist:mcp
 
-      - name: Smoke test MCP bundle
-        run: |
-          set -euo pipefail
-          unzip -q release/ServerManager-mcp.zip -d package/mcp
-          reply=$(printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"smoke","version":"0"}}}' | timeout 15 node package/mcp/index.js)
-          echo "$reply"
-          echo "$reply" | grep -q '"server-manager"'
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
