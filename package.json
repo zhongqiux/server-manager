@@ -19,6 +19,7 @@
     "dist:win": "npm run dist",
     "dist:mac": "npm run dist",
     "dist:mcp": "npm run build -w @sm/mcp && node scripts/build-mcp.mjs",
+    "site:dist": "node scripts/build-site-dist.mjs",
     "typecheck": "tsc -b packages/shared packages/server packages/mcp && tsc -p packages/web --noEmit",
     "start": "node --disable-warning=ExperimentalWarning packages/server/dist/main.js",
     "mcp": "node packages/mcp/dist/index.js",
