@@ -167,6 +167,20 @@ npm run mcp         # 启动 MCP stdio 服务
 
 ---
 
+## 宣传页（site/）
+
+`site/` 是零依赖的产品宣传单页（原生 HTML / CSS / JS，无外部字体与 CDN），可直接双击 `site/index.html` 预览，也可以原样托管到 GitHub Pages 或任意静态服务器。
+
+发布前只需修改 `site/config.js`：
+
+- `downloadUrl`：网盘分享页或直链；为空时页面上的下载按钮显示“即将开放”，填入后自动启用
+- `version` / `size` / `os`：下载区展示的版本信息
+- `sha256`：可选，填入后下载区展示校验值
+
+页面截图位于 `site/assets/`，均来自演示模式的真实界面。更新 exe 后，请同步更新 `config.js` 与本文档的「当前构建记录」。
+
+---
+
 ## 打包单文件 exe（Windows）
 
 ```bash
@@ -237,6 +251,7 @@ packages/shared/    # 纯类型 + 纯函数（模板渲染、同步 diff、事�
 packages/server/    # Express 5 API、SQLite、SSH 连接池、同步引擎、任务引擎、GPU Hub
 packages/mcp/       # stdio MCP 服务（REST 薄客户端，供 agent 接入）
 packages/web/       # React + antd 5 前端（Vite）
+site/               # 产品宣传单页（零依赖静态页面，下载链接见 site/config.js）
 scripts/build-sea.mjs  # 单文件 exe 构建链
 ```
 
