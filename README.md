@@ -223,6 +223,8 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
+当前发布：[v0.1.0](https://github.com/zhongqiux/server-manager/releases/tag/v0.1.0)，含 Windows x64（约 97 MB）、macOS arm64 / x64（压缩包各约 41 MB）与 `SHA256SUMS.txt`。
+
 > 签名说明：Windows exe 未做 Authenticode 签名，SmartScreen 会提示“未知发布者”；macOS 为 ad-hoc 签名、未公证，首次打开需右键“打开”，或执行 `xattr -dr com.apple.quarantine ServerManager`。
 
 ### 本地 Windows 构建记录
