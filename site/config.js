@@ -8,6 +8,6 @@ window.SM_SITE = {
   },
   checksumsUrl: 'https://github.com/zhongqiux/server-manager/releases/latest/download/SHA256SUMS.txt',
   version: 'v0.1.0',
-  size: 'Windows 约 97 MB · macOS 压缩包约 41 MB',
+  size: 'Windows 约 97 MB · macOS 约 41 MB',
   os: 'Windows 10 / 11 · macOS（ARM / Intel）',
 };
