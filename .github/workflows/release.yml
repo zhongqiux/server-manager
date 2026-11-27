@@ -66,9 +66,43 @@ jobs:
           path: package/${{ matrix.asset }}
           if-no-files-found: error
 
+  mcp:
+    name: mcp
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build MCP bundle
+        run: npm run dist:mcp
+
+      - name: Smoke test MCP bundle
+        run: |
+          set -euo pipefail
+          unzip -q release/ServerManager-mcp.zip -d package/mcp
+          reply=$(printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"smoke","version":"0"}}}' | timeout 15 node package/mcp/index.js)
+          echo "$reply"
+          echo "$reply" | grep -q '"server-manager"'
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp
+          path: release/ServerManager-mcp.zip
+          if-no-files-found: error
+
   release:
     if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-dryrun')
-    needs: build
+    needs: [build, mcp]
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
@@ -96,6 +130,7 @@ jobs:
           | Windows 10 / 11 x64 | `ServerManager-windows-x64.exe` |
           | macOS Apple Silicon | `ServerManager-macos-arm64.tar.gz` |
           | macOS Intel | `ServerManager-macos-x64.tar.gz` |
+          | MCP 服务（可选，需 Node.js 22.18+） | `ServerManager-mcp.zip` |
 
           ## 首次运行
 

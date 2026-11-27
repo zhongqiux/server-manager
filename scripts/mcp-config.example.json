@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "server-manager": {
+      "command": "node",
+      "args": ["/absolute/path/to/ServerManager-mcp/index.js"],
+      "env": {
+        "SM_MCP_BASE_URL": "http://127.0.0.1:8787"
+      }
+    }
+  }
+}

@@ -120,12 +120,12 @@ npm run mcp         # 构建后启动 MCP stdio 服务（供 agent 接入，见�
 
 `packages/mcp` 提供一个独立的 **stdio MCP 服务**，作为本地 REST API 的薄客户端：不复制业务逻辑、不改动现有服务端，也不读写服务器凭据。agent 通过它完成「查看资源 → 预检 → 同步 → 运行 → 读日志」的闭环。
 
-**前置**：应用正在运行（开发模式 `npm start`，或已打开的 `ServerManager.exe`）；MCP 进程本身需要 Node.js，未打包进 exe。
+**获取方式**：
 
-```bash
-npm run build       # 首次使用需构建（会产出 packages/mcp/dist/index.js）
-npm run mcp         # 启动 MCP stdio 服务
-```
+- 免构建：从 [Release](https://github.com/zhongqiux/server-manager/releases/latest) 下载 `ServerManager-mcp.zip`（单文件 bundle + 示例配置 + README），解压后 `node index.js` 即可启动
+- 源码：`npm run build` 后 `npm run mcp`；打包发布用 `npm run dist:mcp` 生成 zip
+
+**前置**：应用正在运行（开发模式 `npm start`，或已打开的 `ServerManager.exe`）；MCP 进程本身需要 Node.js >= 22.18，未打包进 exe。
 
 在 MCP 客户端（Qoder / Claude Desktop 等）中注册，`args` 换成仓库绝对路径：
 
@@ -214,6 +214,7 @@ npm run dist        # 当前平台；Windows 输出 release/ServerManager.exe，
 | Windows 10 / 11 x64 | `ServerManager-windows-x64.exe` |
 | macOS Apple Silicon | `ServerManager-macos-arm64.tar.gz` |
 | macOS Intel | `ServerManager-macos-x64.tar.gz` |
+| MCP 服务（可选，需 Node.js 22.18+） | `ServerManager-mcp.zip` |
 
 - **手动运行**（Actions → Build desktop release → Run workflow）：只构建并上传 workflow artifacts，不创建 Release，可用于干跑。
 - **推送 `v*` tag**：构建、冒烟测试通过后创建 GitHub Release，附 `SHA256SUMS.txt`：
@@ -223,7 +224,7 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-当前发布：[v0.1.0](https://github.com/zhongqiux/server-manager/releases/tag/v0.1.0)，含 Windows x64（约 97 MB）、macOS arm64 / x64（压缩包各约 41 MB）与 `SHA256SUMS.txt`。
+当前发布：[v0.1.1](https://github.com/zhongqiux/server-manager/releases/tag/v0.1.1)，含 Windows x64（约 97 MB）、macOS arm64 / x64（压缩包各约 41 MB）、MCP 服务包与 `SHA256SUMS.txt`。
 
 > 签名说明：Windows exe 未做 Authenticode 签名，SmartScreen 会提示“未知发布者”；macOS 为 ad-hoc 签名、未公证，首次打开需右键“打开”，或执行 `xattr -dr com.apple.quarantine ServerManager`。
 

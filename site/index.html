@@ -277,7 +277,12 @@
               <p>可选的内置 MCP 服务，把“查 GPU → 预检 → 同步 → 运行 → 读日志”封装成 24 个工具；默认 dry-run，不读写凭据，不触碰已有会话。</p>
             </div>
           </div>
-          <code><span>$</span> npm run mcp</code>
+          <div class="agent-actions">
+            <a class="btn btn-secondary btn-sm" href="#download" data-download-platform="mcp">
+              <svg class="icon"><use href="#i-download"/></svg>下载 MCP 服务包
+            </a>
+            <span class="agent-note">可选 · 需 Node.js 22.18+，解压即用</span>
+          </div>
         </aside>
       </div>
     </section>
@@ -386,7 +391,7 @@
             <h2>把下一轮实验，<br />交给调度台。</h2>
             <p>不注册、不上传、不依赖云服务。选择你的系统，下载后即可连接第一台服务器。</p>
             <ul class="download-meta">
-              <li><span>版本</span><b data-site-version>v0.1.0</b></li>
+              <li><span>版本</span><b data-site-version>v0.1.1</b></li>
               <li><span>平台</span><b data-site-os>Windows 10 / 11 · macOS</b></li>
               <li><span>大小</span><b data-site-size>Windows 约 97 MB · macOS 约 41 MB</b></li>
             </ul>
@@ -447,8 +452,18 @@
             <p>Windows x64 与 macOS（Apple Silicon / Intel）均提供单文件包；macOS 包为 ad-hoc 签名、未公证，首次打开需右键“打开”。Linux 可从源码构建运行。</p>
           </details>
           <details class="reveal">
-            <summary>MCP 是什么？必须安装吗？</summary>
-            <p>MCP 是给 AI Agent 调用的可选接口，不是主程序的一部分。它需要本地 Node.js，运行 <code>npm run mcp</code> 后通过 MCP 客户端连接；工具默认 dry-run、只读凭据、不触碰已有会话。日常手动使用完全不需要它。</p>
+            <summary>MCP 是什么？怎么下载？</summary>
+            <p>MCP 是给 AI Agent 调用的可选接口，不是主程序的一部分，日常手动使用不需要它。它需要本地 Node.js 22.18+，并保持主程序在运行。下载 <a class="faq-link" href="#download" data-download-platform="mcp">ServerManager-mcp.zip</a>（约 0.1 MB）并解压到任意目录，然后在 MCP 客户端（Qoder / Claude Desktop 等）中注册：</p>
+            <pre class="faq-code">{
+  "mcpServers": {
+    "server-manager": {
+      "command": "node",
+      "args": ["/解压目录/ServerManager-mcp/index.js"],
+      "env": { "SM_MCP_BASE_URL": "http://127.0.0.1:8787" }
+    }
+  }
+}</pre>
+            <p>重启客户端后即可看到 24 个工具；工具默认 dry-run、只读凭据、不触碰已有会话。完整说明见压缩包内 README。</p>
           </details>
         </div>
       </div>
