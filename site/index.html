@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>科研 GPU 调度台 · 多服务器实验调度</title>
   <script>document.documentElement.classList.add('js');</script>
-  <meta name="description" content="把散落的 GPU 服务器收进一个本地调度台：统一 SSH 接入、SFTP/Git 增量同步、tmux/screen 会话运行、实时日志与 GPU 监控。Windows / macOS 单文件，数据不出本机。" />
+  <meta name="description" content="把散落的 GPU 服务器收进一个本地调度台：统一 SSH 接入、SFTP/Git 增量同步、tmux/screen 会话运行、实时日志与 GPU 监控。可选 MCP，让 AI Agent 用一份上下文调度所有服务器。Windows / macOS 单文件，数据不出本机。" />
   <meta property="og:title" content="科研 GPU 调度台 · 多服务器实验调度" />
-  <meta property="og:description" content="一眼看到哪张 GPU 空闲，一键增量同步代码，在 tmux / screen 中安全运行，实时读日志。" />
+  <meta property="og:description" content="一个本地控制面，让 Agent 拥有跨服务器的统一上下文；人用界面、Agent 走 MCP，操作同一套状态与日志。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="assets/dashboard.png" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b1220'/%3E%3Cpath d='M18 5 8 18h6l-1 9 11-14h-7l1-8Z' fill='%2352e0a4'/%3E%3C/svg%3E" />
@@ -46,6 +46,7 @@
       <nav class="site-nav" id="site-nav" aria-label="页面导航">
         <a href="#problems">问题</a>
         <a href="#features">功能</a>
+        <a href="#agent">Agent</a>
         <a href="#interface">界面</a>
         <a href="#guide">使用指南</a>
         <a href="#faq">常见问题</a>
@@ -78,6 +79,7 @@
             <li><svg class="icon"><use href="#i-monitor"/></svg><span data-site-os>Windows 10/11 · macOS</span></li>
             <li><svg class="icon"><use href="#i-layers"/></svg><span data-site-size>Windows 约 97 MB · macOS 约 41 MB</span></li>
             <li><svg class="icon"><use href="#i-check"/></svg>不需要安装 Node.js</li>
+            <li><svg class="icon"><use href="#i-bolt"/></svg><span>可选 MCP · 可被 Agent 调度</span></li>
           </ul>
         </div>
 
@@ -110,7 +112,7 @@
 
     <div class="ticker" aria-hidden="true">
       <div class="container ticker-inner">
-        <span>2–N 台异构服务器</span><span>SFTP 增量 + Git</span><span>tmux / screen 会话</span><span>SSE 实时日志</span><span>nvidia-smi 监控</span><span>凭据只存本机</span>
+        <span>2–N 台异构服务器</span><span>SFTP 增量 + Git</span><span>tmux / screen 会话</span><span>SSE 实时日志</span><span>nvidia-smi 监控</span><span>凭据只存本机</span><span>MCP · Agent 统一接入</span>
       </div>
     </div>
 
@@ -269,11 +271,84 @@
           </article>
         </div>
 
+        </div>
+    </section>
+
+    <section class="section section-agent" id="agent">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="eyebrow">Agent 原生接入 · 可选 MCP</p>
+          <h2>别再每台服务器装 Agent，<br />一个 Agent 管所有服务器。</h2>
+          <p class="section-sub">在每台 GPU 机器上各装一个 Agent 看似直接，但上下文彼此隔离、凭据散落各处、操作无从审计。调度台把 Agent 接在本地控制面上：一个入口，统一上下文，受控操作。</p>
+        </div>
+
+        <div class="agent-compare">
+          <article class="compare-card reveal">
+            <header class="compare-head">
+              <span class="compare-icon bad"><svg class="icon"><use href="#i-server"/></svg></span>
+              <div>
+                <h3>每台服务器各装一个 Agent</h3>
+                <p>把复杂度搬到了每一台机器上。</p>
+              </div>
+            </header>
+            <ul class="compare-list bad">
+              <li><svg class="icon"><use href="#i-close"/></svg>上下文彼此隔离，没有跨机视角</li>
+              <li><svg class="icon"><use href="#i-close"/></svg>凭据被分发到 N 台机器，泄露面变大</li>
+              <li><svg class="icon"><use href="#i-close"/></svg>直接拿到 shell，误操作无从拦截</li>
+              <li><svg class="icon"><use href="#i-close"/></svg>每台装一遍、升一遍，版本逐渐漂移</li>
+            </ul>
+          </article>
+
+          <article class="compare-card good reveal delay-1">
+            <header class="compare-head">
+              <span class="compare-icon good"><svg class="icon"><use href="#i-bolt"/></svg></span>
+              <div>
+                <h3>一个本地控制面，一个 Agent</h3>
+                <p>Agent 通过 MCP 接入调度台，所有服务器共享同一份上下文。</p>
+              </div>
+            </header>
+            <ul class="compare-list good">
+              <li><svg class="icon"><use href="#i-check"/></svg>服务器、项目、任务、GPU 状态在同一份上下文里</li>
+              <li><svg class="icon"><use href="#i-check"/></svg>SSH 凭据只存本机，Agent 只连 127.0.0.1</li>
+              <li><svg class="icon"><use href="#i-check"/></svg>24 个结构化工具替代裸 shell，默认 dry-run、可只读</li>
+              <li><svg class="icon"><use href="#i-check"/></svg>服务器零安装，升级只升一处</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="agent-points">
+          <article class="agent-point reveal">
+            <span class="point-num">01</span>
+            <h3>一份上下文，跨机推理</h3>
+            <p>“哪台 A100 空闲？”“把这个项目推到所有 4090 机器并起训练。”跨服务器的问题，终于有地方可问。</p>
+          </article>
+          <article class="agent-point reveal delay-1">
+            <span class="point-num">02</span>
+            <h3>受控操作，而非裸 shell</h3>
+            <p>同步默认 dry-run，镜像删除需二次确认，可整体切到只读模式；Agent 的每一步都落在界面上，可回看、可审计。</p>
+          </article>
+          <article class="agent-point reveal delay-2">
+            <span class="point-num">03</span>
+            <h3>凭证不出本机</h3>
+            <p>密码与私钥加密保存在本地数据库；Agent 跑在你的电脑上，只和 127.0.0.1 对话，凭据不进模型、不上传。</p>
+          </article>
+          <article class="agent-point reveal">
+            <span class="point-num">04</span>
+            <h3>零侵入，免运维</h3>
+            <p>GPU 机器常在内网、受限或按需释放。任意可 SSH 的机器开箱即用，不用装运行时，也没有每台一份的版本要维护。</p>
+          </article>
+          <article class="agent-point reveal delay-1">
+            <span class="point-num">05</span>
+            <h3>人机同轨</h3>
+            <p>人用界面、Agent 走 MCP，操作的是同一套状态和日志：Agent 起的任务你可以接着看，你排好的计划 Agent 也能直接执行。</p>
+          </article>
+        </div>
+
         <aside class="agent-strip reveal">
           <div class="agent-copy">
             <span class="feature-icon emerald"><svg class="icon"><use href="#i-bolt"/></svg></span>
             <div>
-              <h3>给 Agent 也留了一个入口</h3>
+              <h3>让 Agent 接入你的 GPU 集群</h3>
               <p>可选的内置 MCP 服务，把“查 GPU → 预检 → 同步 → 运行 → 读日志”封装成 24 个工具；默认 dry-run，不读写凭据，不触碰已有会话。</p>
             </div>
           </div>
@@ -481,6 +556,7 @@
       </div>
       <nav class="footer-nav" aria-label="页脚导航">
         <a href="#features">功能</a>
+        <a href="#agent">Agent</a>
         <a href="#interface">界面</a>
         <a href="#guide">使用指南</a>
         <a href="#faq">常见问题</a>
