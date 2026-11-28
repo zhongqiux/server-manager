@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>科研 GPU 调度台 · 多服务器实验调度</title>
   <script>document.documentElement.classList.add('js');</script>
-  <meta name="description" content="把散落的 GPU 服务器收进一个本地调度台：统一 SSH 接入、SFTP/Git 增量同步、tmux/screen 会话运行、实时日志与 GPU 监控。可选 MCP，让 AI Agent 用一份上下文调度所有服务器。Windows / macOS 单文件，数据不出本机。" />
+  <meta name="description" content="把散落的 GPU 服务器收进一个本地调度台：统一 SSH 接入、SFTP/Git 增量同步、tmux/screen 会话运行、实时日志与 GPU 监控。通过 MCP，让一个 Agent 用一份上下文调度所有服务器。Windows / macOS 单文件，数据不出本机。" />
   <meta property="og:title" content="科研 GPU 调度台 · 多服务器实验调度" />
   <meta property="og:description" content="一个本地控制面，让 Agent 拥有跨服务器的统一上下文；人用界面、Agent 走 MCP，操作同一套状态与日志。" />
   <meta property="og:type" content="website" />
@@ -39,16 +39,15 @@
 
   <header class="site-header" id="top">
     <div class="container header-inner">
-      <a class="brand" href="#top" aria-label="科研 GPU 调度台首页">
+      <a class="brand" href="#what" aria-label="科研 GPU 调度台首页">
         <span class="brand-mark"><svg class="icon"><use href="#i-bolt"/></svg></span>
         <span class="brand-text">科研 GPU 调度台<small>SERVER MANAGER</small></span>
       </a>
       <nav class="site-nav" id="site-nav" aria-label="页面导航">
-        <a href="#problems">问题</a>
-        <a href="#features">功能</a>
-        <a href="#agent">Agent</a>
-        <a href="#interface">界面</a>
-        <a href="#guide">使用指南</a>
+        <a href="#what">是什么</a>
+        <a href="#why">为什么</a>
+        <a href="#how">怎么用</a>
+        <a href="#download">下载</a>
         <a href="#faq">常见问题</a>
       </nav>
       <div class="header-actions">
@@ -62,28 +61,28 @@
     </div>
   </header>
 
-  <main>
-    <section class="hero">
+  <div class="deck-progress" aria-hidden="true"><i></i></div>
+
+  <main class="deck">
+    <!-- 01 是什么 -->
+    <section class="slide hero" id="what" data-num="01" aria-labelledby="what-title">
       <div class="container hero-grid">
-        <div class="hero-copy reveal">
-          <p class="eyebrow"><span class="pulse-dot"></span>本地单用户 · Windows / macOS 单文件 · 无需登录</p>
-          <h1><span class="hero-line">把散落的 GPU 服务器</span><br /><span class="grad">收进一个调度台。</span></h1>
-          <p class="lead">换机器不用换命令，传代码不再手写 rsync。统一 SSH 接入、增量同步、tmux / screen 会话运行与实时日志，让实验从代码到结果只走一条路径。</p>
-          <div class="hero-actions">
+        <div class="hero-copy">
+          <h1 id="what-title" class="anim"><span class="hero-line">把散落的 GPU 服务器</span><br /><span class="grad">收进一个调度台。</span></h1>
+          <p class="lead anim">一个跑在自己电脑上的本地控制台：统一接入所有 GPU 服务器，增量同步代码，在 tmux / screen 里运行任务，实时查看日志与显卡状态；再通过 MCP，把这一整套能力交给你的 Agent。</p>
+          <div class="hero-actions anim">
             <a class="btn btn-primary btn-lg" href="#download">
               <svg class="icon"><use href="#i-download"/></svg><span>下载桌面版</span>
             </a>
-            <a class="btn btn-secondary btn-lg" href="#guide">查看使用指南<svg class="icon"><use href="#i-arrow"/></svg></a>
+            <a class="btn btn-secondary btn-lg" href="#how">看看怎么用<svg class="icon"><use href="#i-arrow"/></svg></a>
           </div>
-          <ul class="hero-meta">
-            <li><svg class="icon"><use href="#i-monitor"/></svg><span data-site-os>Windows 10/11 · macOS</span></li>
-            <li><svg class="icon"><use href="#i-layers"/></svg><span data-site-size>Windows 约 97 MB · macOS 约 41 MB</span></li>
-            <li><svg class="icon"><use href="#i-check"/></svg>不需要安装 Node.js</li>
-            <li><svg class="icon"><use href="#i-bolt"/></svg><span>可选 MCP · 可被 Agent 调度</span></li>
+          <ul class="hero-meta anim">
+            <li><svg class="icon"><use href="#i-monitor"/></svg>Windows / macOS 单文件</li>
+            <li><svg class="icon"><use href="#i-bolt"/></svg>MCP · Agent 可接入</li>
           </ul>
         </div>
 
-        <div class="hero-visual reveal delay-1">
+        <div class="hero-visual anim">
           <div class="browser-frame">
             <div class="browser-bar">
               <span class="browser-dots"><i></i><i></i><i></i></span>
@@ -108,362 +107,199 @@
           </div>
         </div>
       </div>
-    </section>
-
-    <div class="ticker" aria-hidden="true">
-      <div class="container ticker-inner">
-        <span>2–N 台异构服务器</span><span>SFTP 增量 + Git</span><span>tmux / screen 会话</span><span>SSE 实时日志</span><span>nvidia-smi 监控</span><span>凭据只存本机</span><span>MCP · Agent 统一接入</span>
-      </div>
-    </div>
-
-    <section class="section" id="problems">
-      <div class="container">
-        <div class="section-head reveal">
-          <p class="eyebrow">为什么需要它</p>
-          <h2>科研人的时间，<br class="mobile-break" />不该耗在这些重复劳动上</h2>
-          <p class="section-sub">实验室机器、组内共享机、云租 GPU —— 机器越多，手工维护的成本越高，出错的机会也越多。</p>
-        </div>
-        <div class="pain-grid">
-          <article class="pain-card reveal">
-            <span class="pain-icon"><svg class="icon"><use href="#i-plug"/></svg></span>
-            <h3>连接信息七零八落</h3>
-            <p>地址、端口、密码、私钥散在聊天记录和笔记里，换台机器就要重新翻一遍。</p>
-          </article>
-          <article class="pain-card reveal delay-1">
-            <span class="pain-icon"><svg class="icon"><use href="#i-cpu"/></svg></span>
-            <h3>哪张卡空着全靠问</h3>
-            <p>不知道实验室机器和云主机现在能不能跑，白白等待，或者和同门撞车。</p>
-          </article>
-          <article class="pain-card reveal delay-2">
-            <span class="pain-icon"><svg class="icon"><use href="#i-sync"/></svg></span>
-            <h3>传代码像拆盲盒</h3>
-            <p>手写 rsync / scp，路径、忽略规则、权限位每次都要改，传错了还不知道。</p>
-          </article>
-          <article class="pain-card reveal">
-            <span class="pain-icon"><svg class="icon"><use href="#i-layers"/></svg></span>
-            <h3>每台机器一套环境</h3>
-            <p>conda 环境、数据目录、GPU 编号、启动命令各不相同，换机就得重写。</p>
-          </article>
-          <article class="pain-card reveal delay-1">
-            <span class="pain-icon"><svg class="icon"><use href="#i-clock"/></svg></span>
-            <h3>SSH 一断，训练白跑</h3>
-            <p>前台命令跟着终端退出；日志滚过去就找不回来，只能重跑再看。</p>
-          </article>
-          <article class="pain-card reveal delay-2">
-            <span class="pain-icon"><svg class="icon"><use href="#i-folder"/></svg></span>
-            <h3>代码在 A，实验跑在 B</h3>
-            <p>先下载再上传，漏文件、传一半、跑成旧版本，排查半天才发现是同步问题。</p>
-          </article>
-        </div>
+      <div class="scroll-hint" aria-hidden="true">
+        <span>向下滚动</span>
+        <svg class="icon"><use href="#i-arrow"/></svg>
       </div>
     </section>
 
-    <section class="section section-features" id="features">
+    <!-- 02 为什么 -->
+    <section class="slide" id="why" data-num="02" aria-labelledby="why-title">
       <div class="container">
-        <div class="section-head reveal">
-          <p class="eyebrow">一个调度台，覆盖完整闭环</p>
-          <h2>从接入、同步到运行，<br class="mobile-break" />只走一条路径</h2>
-          <p class="section-sub">项目与服务器通过 Target 绑定：路径、环境、GPU、命令一次配置，之后在任意机器上复用。</p>
-        </div>
+        <div class="why-panel anim">
+          <div class="why-main">
+            <div class="why-head">
+              <h2 id="why-title" class="anim">机器一多，<br />麻烦就不在实验本身</h2>
+              <p class="why-sub anim">连接散落、空卡靠问、断线白跑；把 Agent 装到每一台机器上，还会让上下文和凭据一起碎掉。</p>
+            </div>
 
-        <div class="bento">
-          <article class="feature-card span-7 reveal">
-            <div class="feature-head">
-              <span class="feature-icon emerald"><svg class="icon"><use href="#i-cpu"/></svg></span>
-              <div><h3>GPU 状态，一屏看清</h3><p>每张卡的显存、利用率、温度、功耗与计算进程，按 UUID 关联；空闲卡直接标出来。</p></div>
-            </div>
-            <div class="gpu-demo" aria-hidden="true">
-              <div class="gpu-demo-head"><span>云 GPU · 4×3090</span><span class="pill ok">空闲 4/4</span></div>
-              <div class="gpu-row"><span>GPU 0</span><div class="bar"><i style="--w:2%"></i></div><b>2%</b><em>可运行</em></div>
-              <div class="gpu-row"><span>GPU 1</span><div class="bar"><i style="--w:1%"></i></div><b>1%</b><em>可运行</em></div>
-              <div class="gpu-row"><span>GPU 2</span><div class="bar"><i style="--w:3%"></i></div><b>3%</b><em>可运行</em></div>
-              <div class="gpu-row busy"><span>GPU 3</span><div class="bar"><i style="--w:92%"></i></div><b>92%</b><em>AF2 训练</em></div>
-              <div class="gpu-demo-foot">实时数据经全局 SSE 推送 · nvidia-smi 双查询 · 无 GPU 自动降级</div>
-            </div>
-          </article>
+            <ol class="why-points">
+              <li class="why-point anim">
+                <span class="why-point-icon"><svg class="icon"><use href="#i-plug"/></svg></span>
+                <div>
+                  <h3>连接七零八落</h3>
+                  <p>地址、端口、密码、私钥散在聊天记录和笔记里，换台机器就要重新翻一遍。</p>
+                </div>
+                <span class="why-point-num" aria-hidden="true">01</span>
+              </li>
+              <li class="why-point anim">
+                <span class="why-point-icon"><svg class="icon"><use href="#i-cpu"/></svg></span>
+                <div>
+                  <h3>空卡和任务靠问</h3>
+                  <p>不知道哪台机器能跑，训练跑到哪一步也要挨个问；等待和撞车都成了日常。</p>
+                </div>
+                <span class="why-point-num" aria-hidden="true">02</span>
+              </li>
+              <li class="why-point anim">
+                <span class="why-point-icon"><svg class="icon"><use href="#i-clock"/></svg></span>
+                <div>
+                  <h3>SSH 一断就白跑</h3>
+                  <p>前台命令跟着终端退出，日志滚过去就找不回来，只能从头再跑一遍。</p>
+                </div>
+                <span class="why-point-num" aria-hidden="true">03</span>
+              </li>
+            </ol>
+          </div>
 
-          <article class="feature-card span-5 reveal delay-1">
-            <div class="feature-head">
-              <span class="feature-icon blue"><svg class="icon"><use href="#i-server"/></svg></span>
-              <div><h3>一次接入，长期复用</h3><p>密码或私钥、TOFU / 严格 host key 校验；连接测试拆成 TCP、握手、认证、执行四步。</p></div>
-            </div>
-            <ul class="check-list">
-              <li><svg class="icon"><use href="#i-check"/></svg>首次连接自动采集硬件与能力</li>
-              <li><svg class="icon"><use href="#i-check"/></svg>tmux / screen / git / tail 能力探测</li>
-              <li><svg class="icon"><use href="#i-check"/></svg>老服务器自动降级兼容</li>
-              <li><svg class="icon"><use href="#i-check"/></svg>面板不返回密码或私钥</li>
-            </ul>
-            <div class="mini-steps" aria-hidden="true">
-              <span>TCP</span><i></i><span>握手</span><i></i><span>认证</span><i></i><span>执行</span>
-            </div>
-          </article>
-
-          <article class="feature-card span-6 reveal">
-            <div class="feature-head">
-              <span class="feature-icon amber"><svg class="icon"><use href="#i-sync"/></svg></span>
-              <div><h3>增量同步，动手前先看计划</h3><p>对比文件大小与 mtime，先给出 add / update / delete 的 dry-run 计划，再真正写入。</p></div>
-            </div>
-            <ul class="tag-list">
-              <li>dry-run</li><li>忽略规则可解释</li><li>原子替换</li><li>保留 mtime</li><li>A→B 中转</li><li>镜像删除需确认</li><li>Git commit / ff-merge</li>
-            </ul>
-            <div class="plan-demo" aria-hidden="true">
-              <div><span class="plan-file">src/trainer.py</span><span class="pill blue">更新 · 大小变化</span></div>
-              <div><span class="plan-file">configs/exp.yaml</span><span class="pill ok">新增 · 远端缺失</span></div>
-              <div><span class="plan-file">checkpoints/last.pt</span><span class="pill muted">忽略 · 规则命中</span></div>
-            </div>
-          </article>
-
-          <article class="feature-card span-6 reveal delay-1">
-            <div class="feature-head">
-              <span class="feature-icon violet"><svg class="icon"><use href="#i-terminal"/></svg></span>
-              <div><h3>在你的会话里运行，不打断你</h3><p>默认新建独立会话；也可以选择已有 tmux / screen 会话，新开窗口或注入空闲窗口。</p></div>
-            </div>
-            <div class="session-demo" aria-hidden="true">
-              <div class="session-line"><span class="dot ok"></span><span>tmux · protein</span><b>3 windows</b></div>
-              <div class="session-line"><span class="dot ok"></span><span>tmux · lab</span><b>1 window</b></div>
-              <div class="session-line"><span class="dot warn"></span><span>screen · autodl</span><b>1 window</b></div>
-              <div class="session-foot">只清理本工具创建的内容，已有会话和窗口不会被关闭</div>
-            </div>
-            <ul class="check-list compact">
-              <li><svg class="icon"><use href="#i-check"/></svg>脚本上传执行，避免引号与换行地狱</li>
-              <li><svg class="icon"><use href="#i-check"/></svg>五步停止，核验进程组防误杀</li>
-            </ul>
-          </article>
-
-          <article class="feature-card span-4 reveal">
-            <div class="feature-head">
-              <span class="feature-icon emerald"><svg class="icon"><use href="#i-activity"/></svg></span>
-              <div><h3>日志实时且不丢</h3><p>SSE 以字节偏移续传，断线重连不重不漏；ANSI 清洗、过滤、只看错误、下载。</p></div>
-            </div>
-            <div class="log-demo" aria-hidden="true">
-              <div><span>[17:03:43]</span> epoch 12/50 batch 21/42 loss=1.2071</div>
-              <div><span>[17:03:48]</span> epoch 12/50 batch 22/42 loss=1.2002</div>
-              <div><span>[17:03:53]</span> epoch 12/50 batch 23/42 loss=1.1934</div>
-              <div class="log-cursor"><span>[17:03:58]</span> 正在跟随最新…</div>
-            </div>
-          </article>
-
-          <article class="feature-card span-4 reveal delay-1">
-            <div class="feature-head">
-              <span class="feature-icon blue"><svg class="icon"><use href="#i-layers"/></svg></span>
-              <div><h3>一个项目，多台目标</h3><p>同一个项目绑定 A100、4090、云 3090 多个 Target；路径差异用占位符注入，切机器不改代码。</p></div>
-            </div>
-            <div class="target-demo" aria-hidden="true">
-              <span class="target-root"><svg class="icon"><use href="#i-folder"/></svg>protein-fold</span>
-              <div class="target-lines">
-                <span>A100 · /home/gpu/projects/protein-fold</span>
-                <span>4090 · ~/work/protein-fold</span>
-                <span>云 3090 · /root/lab/protein-fold</span>
+          <div class="why-art" aria-hidden="true">
+            <div class="why-board">
+              <div class="why-board-head">
+                <svg class="icon"><use href="#i-folder"/></svg>
+                <span>ssh-notes.txt</span>
+                <b>未整理</b>
+              </div>
+              <div class="why-board-body">
+                <span class="why-chip c1"><b>A100</b><span>10.0.2.15 · root</span></span>
+                <span class="why-chip c2"><b>4090</b><span>密码好像改过？</span></span>
+                <span class="why-chip c3"><b>云 3090</b><span>/root/lab</span></span>
+                <span class="why-chip c4"><span class="why-chip-mono">rsync -avz --delete …</span></span>
+                <span class="why-alert"><svg class="icon"><use href="#i-alert"/></svg>还有 3 台没记</span>
               </div>
             </div>
-          </article>
+          </div>
 
-          <article class="feature-card span-4 reveal delay-2">
-            <div class="feature-head">
-              <span class="feature-icon amber"><svg class="icon"><use href="#i-shield"/></svg></span>
-              <div><h3>本地优先，凭据不出门</h3><p>服务只监听 127.0.0.1 并校验 Host 头；密码与私钥 AES-256-GCM 加密保存在本机。</p></div>
-            </div>
-            <ul class="check-list">
-              <li><svg class="icon"><use href="#i-check"/></svg>无账号体系、无云端中转</li>
-              <li><svg class="icon"><use href="#i-check"/></svg>日志与 Git URL 自动脱敏</li>
-              <li><svg class="icon"><use href="#i-check"/></svg>Git 永不 force push</li>
-            </ul>
-          </article>
-        </div>
-
-        </div>
-    </section>
-
-    <section class="section section-agent" id="agent">
-      <div class="container">
-        <div class="section-head reveal">
-          <p class="eyebrow">Agent 原生接入 · 可选 MCP</p>
-          <h2>别再每台服务器装 Agent，<br />一个 Agent 管所有服务器。</h2>
-          <p class="section-sub">在每台 GPU 机器上各装一个 Agent 看似直接，但上下文彼此隔离、凭据散落各处、操作无从审计。调度台把 Agent 接在本地控制面上：一个入口，统一上下文，受控操作。</p>
-        </div>
-
-        <div class="agent-compare">
-          <article class="compare-card reveal">
-            <header class="compare-head">
-              <span class="compare-icon bad"><svg class="icon"><use href="#i-server"/></svg></span>
+          <div class="why-contrast anim">
+            <div class="why-side bad">
+              <span class="why-side-icon"><svg class="icon"><use href="#i-close"/></svg></span>
               <div>
                 <h3>每台服务器各装一个 Agent</h3>
-                <p>把复杂度搬到了每一台机器上。</p>
+                <ul class="why-tags">
+                  <li>上下文隔离</li>
+                  <li>凭据分发 N 台</li>
+                  <li>裸 shell 无护栏</li>
+                </ul>
               </div>
-            </header>
-            <ul class="compare-list bad">
-              <li><svg class="icon"><use href="#i-close"/></svg>上下文彼此隔离，没有跨机视角</li>
-              <li><svg class="icon"><use href="#i-close"/></svg>凭据被分发到 N 台机器，泄露面变大</li>
-              <li><svg class="icon"><use href="#i-close"/></svg>直接拿到 shell，误操作无从拦截</li>
-              <li><svg class="icon"><use href="#i-close"/></svg>每台装一遍、升一遍，版本逐渐漂移</li>
-            </ul>
-          </article>
-
-          <article class="compare-card good reveal delay-1">
-            <header class="compare-head">
-              <span class="compare-icon good"><svg class="icon"><use href="#i-bolt"/></svg></span>
+            </div>
+            <div class="why-mid" aria-hidden="true"><svg class="icon"><use href="#i-arrow"/></svg></div>
+            <div class="why-side good">
+              <span class="why-side-icon"><svg class="icon"><use href="#i-check"/></svg></span>
               <div>
-                <h3>一个本地控制面，一个 Agent</h3>
-                <p>Agent 通过 MCP 接入调度台，所有服务器共享同一份上下文。</p>
+                <h3>本地控制面 + 一个 Agent</h3>
+                <ul class="why-tags">
+                  <li>一份跨机上下文</li>
+                  <li>凭据只存本机</li>
+                  <li>24 个受控工具</li>
+                </ul>
               </div>
-            </header>
-            <ul class="compare-list good">
-              <li><svg class="icon"><use href="#i-check"/></svg>服务器、项目、任务、GPU 状态在同一份上下文里</li>
-              <li><svg class="icon"><use href="#i-check"/></svg>SSH 凭据只存本机，Agent 只连 127.0.0.1</li>
-              <li><svg class="icon"><use href="#i-check"/></svg>24 个结构化工具替代裸 shell，默认 dry-run、可只读</li>
-              <li><svg class="icon"><use href="#i-check"/></svg>服务器零安装，升级只升一处</li>
-            </ul>
-          </article>
-        </div>
-
-        <div class="agent-points">
-          <article class="agent-point reveal">
-            <span class="point-num">01</span>
-            <h3>一份上下文，跨机推理</h3>
-            <p>“哪台 A100 空闲？”“把这个项目推到所有 4090 机器并起训练。”跨服务器的问题，终于有地方可问。</p>
-          </article>
-          <article class="agent-point reveal delay-1">
-            <span class="point-num">02</span>
-            <h3>受控操作，而非裸 shell</h3>
-            <p>同步默认 dry-run，镜像删除需二次确认，可整体切到只读模式；Agent 的每一步都落在界面上，可回看、可审计。</p>
-          </article>
-          <article class="agent-point reveal delay-2">
-            <span class="point-num">03</span>
-            <h3>凭证不出本机</h3>
-            <p>密码与私钥加密保存在本地数据库；Agent 跑在你的电脑上，只和 127.0.0.1 对话，凭据不进模型、不上传。</p>
-          </article>
-          <article class="agent-point reveal">
-            <span class="point-num">04</span>
-            <h3>零侵入，免运维</h3>
-            <p>GPU 机器常在内网、受限或按需释放。任意可 SSH 的机器开箱即用，不用装运行时，也没有每台一份的版本要维护。</p>
-          </article>
-          <article class="agent-point reveal delay-1">
-            <span class="point-num">05</span>
-            <h3>人机同轨</h3>
-            <p>人用界面、Agent 走 MCP，操作的是同一套状态和日志：Agent 起的任务你可以接着看，你排好的计划 Agent 也能直接执行。</p>
-          </article>
-        </div>
-
-        <aside class="agent-strip reveal">
-          <div class="agent-copy">
-            <span class="feature-icon emerald"><svg class="icon"><use href="#i-bolt"/></svg></span>
-            <div>
-              <h3>让 Agent 接入你的 GPU 集群</h3>
-              <p>可选的内置 MCP 服务，把“查 GPU → 预检 → 同步 → 运行 → 读日志”封装成 24 个工具；默认 dry-run，不读写凭据，不触碰已有会话。</p>
             </div>
           </div>
-          <div class="agent-actions">
-            <a class="btn btn-secondary btn-sm" href="#download" data-download-platform="mcp">
-              <svg class="icon"><use href="#i-download"/></svg>下载 MCP 服务包
-            </a>
-            <span class="agent-note">可选 · 需 Node.js 22.18+，解压即用</span>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <section class="section" id="interface">
-      <div class="container">
-        <div class="section-head reveal">
-          <p class="eyebrow">真实界面</p>
-          <h2>不是概念图，是每天会打开的页面</h2>
-          <p class="section-sub">以下截图来自内置演示模式（合成数据，不连接真实服务器）。点击图片可以放大查看。</p>
-        </div>
-        <div class="gallery">
-          <button class="shot shot-main reveal" type="button" data-shot="assets/workbench.png" data-caption="Target 工作台：dry-run 同步计划、运行任务与会话选择在同一页完成。">
-            <img src="assets/workbench.png" width="1440" height="1000" alt="Target 工作台界面：配置摘要、SFTP 增量同步计划与运行任务区域" loading="lazy" />
-            <span class="shot-caption"><b>Target 工作台</b><span>同步计划 · 运行 · 会话选择</span></span>
-          </button>
-          <button class="shot reveal delay-1" type="button" data-shot="assets/job-detail.png" data-caption="任务详情：状态时间线、实时日志、运行命令与退出码集中在一个页面。">
-            <img src="assets/job-detail.png" width="1440" height="1000" alt="任务详情界面：运行中任务的状态、时间线与实时滚动日志" loading="lazy" />
-            <span class="shot-caption"><b>任务详情</b><span>实时日志 · 状态 · 退出码</span></span>
-          </button>
-          <button class="shot reveal delay-2" type="button" data-shot="assets/servers.png" data-caption="服务器页：统一管理不同网络位置、不同型号的 GPU 机器。">
-            <img src="assets/servers.png" width="1440" height="1000" alt="服务器列表界面：多台 GPU 服务器的状态与硬件信息" loading="lazy" />
-            <span class="shot-caption"><b>服务器</b><span>统一接入 · 硬件快照</span></span>
-          </button>
         </div>
       </div>
     </section>
 
-    <section class="section" id="guide">
+    <!-- 03 怎么用 -->
+    <section class="slide" id="how" data-num="03" aria-labelledby="how-title">
       <div class="container">
-        <div class="section-head reveal">
-          <p class="eyebrow">使用指南</p>
-          <h2>下载、接入、同步、运行</h2>
-          <p class="section-sub">首次配置大约 10 分钟。之后每次实验，只需要第 3、4 步。</p>
-        </div>
+        <div class="how-layout">
+          <div class="how-main">
+            <div class="slide-head how-head">
+              <h2 id="how-title" class="anim">五步，跑起第一个任务</h2>
+              <p class="slide-sub anim">首次配置约 10 分钟；之后每次实验，通常只需要第 3–5 步。<span class="how-hint">悬停左侧步骤，右侧同步预览对应界面。</span></p>
+            </div>
 
-        <div class="guide-grid">
-          <ol class="steps">
-            <li class="step reveal">
-              <span class="step-num">01</span>
-              <div class="step-body">
-                <h3>运行程序</h3>
-                <p>Windows 下载 <code>ServerManager.exe</code> 双击运行；macOS 解压后执行 <code>chmod +x ServerManager &amp;&amp; ./ServerManager</code>。浏览器会自动打开本地界面，数据保存在系统应用数据目录。</p>
-                <div class="note-row"><span class="note-chip">免安装</span><span class="note-chip">单实例</span><span class="note-chip">重启后数据保留</span></div>
-              </div>
-            </li>
-            <li class="step reveal delay-1">
-              <span class="step-num">02</span>
-              <div class="step-body">
-                <h3>添加服务器</h3>
-                <p>填写地址、端口、用户名，选择密码或私钥认证，点击「测试连接」。确认 TCP、SSH 握手、认证与远程执行四步全绿，硬件与 GPU 快照会自动采集。</p>
-                <div class="note-row"><span class="note-chip"><svg class="icon"><use href="#i-shield"/></svg>密码加密存储</span><span class="note-chip">支持 passphrase</span></div>
-              </div>
-            </li>
-            <li class="step reveal delay-2">
-              <span class="step-num">03</span>
-              <div class="step-body">
-                <h3>创建项目与 Target</h3>
-                <p>项目指向本地代码根目录；在项目里添加 Target 绑定一台服务器，填写远程代码目录、数据目录、conda 环境与运行命令。路径差异交给占位符，换机器不用改代码。</p>
-                <div class="note-row"><span class="note-chip">可先预览最终脚本</span><span class="note-chip">同一项目可绑多台机器</span></div>
-              </div>
-            </li>
-            <li class="step reveal">
-              <span class="step-num">04</span>
-              <div class="step-body">
-                <h3>检查差异，同步并运行</h3>
-                <p>先点「检查差异」查看 dry-run 计划，确认后开始增量同步。在运行区选择新建独立会话，或使用已有 tmux / screen 会话的新窗口；启动后进入任务详情看实时日志。</p>
-                <div class="note-row"><span class="note-chip">运行前可自动同步</span><span class="note-chip">停止不会关闭已有会话</span></div>
-              </div>
-            </li>
-          </ol>
+            <ol class="how-timeline">
+              <li class="how-row anim is-current" data-step="0" data-address="127.0.0.1 · 总览">
+                <span class="how-node">01</span>
+                <div class="how-body">
+                  <h3>启动程序</h3>
+                  <p>下载对应系统的单文件并双击运行，浏览器自动打开本地界面。没有服务器时，用 <code>SM_DEMO=1</code> 先看演示数据。</p>
+                </div>
+              </li>
+              <li class="how-row anim" data-step="1" data-address="127.0.0.1 · 服务器">
+                <span class="how-node">02</span>
+                <div class="how-body">
+                  <h3>接入服务器</h3>
+                  <p>填写地址、端口与账号，选择密码或私钥；测试连接四步全绿后，自动采集硬件与 GPU 快照。</p>
+                </div>
+              </li>
+              <li class="how-row anim" data-step="2" data-address="127.0.0.1 · Target 工作台">
+                <span class="how-node">03</span>
+                <div class="how-body">
+                  <h3>配置 Target</h3>
+                  <p>项目绑定本地代码目录，Target 绑定远程路径、conda 环境与运行命令；同一个项目可绑多台机器。</p>
+                </div>
+              </li>
+              <li class="how-row anim" data-step="3" data-address="127.0.0.1 · 任务详情">
+                <span class="how-node">04</span>
+                <div class="how-body">
+                  <h3>同步并运行</h3>
+                  <p>先查看 dry-run 差异计划，确认后增量同步；在新建或已有的 tmux / screen 会话中启动任务。</p>
+                </div>
+              </li>
+              <li class="how-row anim" data-step="4" data-address="MCP · gpu-server-manager">
+                <span class="how-node">05</span>
+                <div class="how-body">
+                  <h3>交给 Agent</h3>
+                  <p>下载 MCP 服务包并注册，Agent 就有了 24 个工具：查 GPU、预检、同步、起停任务、读日志。<a class="how-link" href="#download" data-download-platform="mcp">下载 MCP 服务包</a></p>
+                </div>
+              </li>
+            </ol>
+          </div>
 
-          <aside class="side-panel reveal delay-1">
-            <h3><svg class="icon"><use href="#i-alert"/></svg>首次运行提示</h3>
-            <div class="side-item">
-              <b>Windows 提示“未知发布者”</b>
-              <p>exe 未做代码签名。点击「更多信息 → 仍要运行」即可；分发时可附带 SHA256 供校验。</p>
+          <aside class="how-visual anim" aria-hidden="true">
+            <div class="browser-frame">
+              <div class="browser-bar">
+                <span class="browser-dots"><i></i><i></i><i></i></span>
+                <span class="browser-address" data-how-address>127.0.0.1 · 总览</span>
+                <span class="browser-live"><i></i>实时</span>
+              </div>
+              <div class="browser-screen">
+                <img class="how-shot is-on" data-how-shot="0" src="assets/dashboard.png" width="1440" height="1000" alt="" loading="lazy" />
+                <img class="how-shot" data-how-shot="1" src="assets/servers.png" width="1440" height="1000" alt="" loading="lazy" />
+                <img class="how-shot" data-how-shot="2" src="assets/workbench.png" width="1440" height="1000" alt="" loading="lazy" />
+                <img class="how-shot" data-how-shot="3" src="assets/job-detail.png" width="1440" height="1000" alt="" loading="lazy" />
+                <div class="how-shot how-agent" data-how-shot="4">
+                  <p class="agent-line agent-head"><span class="agent-tag">MCP</span><span>gpu-server-manager · 24 tools</span></p>
+                  <p class="agent-line"><span class="agent-prompt">$</span><span>gpu.list_servers</span></p>
+                  <p class="agent-line agent-out">A100 双卡实验机 · 空闲 2/2</p>
+                  <p class="agent-line agent-out">云 GPU 4×3090 · 空闲 4/4</p>
+                  <p class="agent-line"><span class="agent-prompt">$</span><span>jobs.start 蛋白质结构预测</span></p>
+                  <p class="agent-line agent-ok">✓ +2 ~1 · dry-run 通过，tmux 已启动</p>
+                </div>
+              </div>
             </div>
-            <div class="side-item">
-              <b>macOS 首次打开被拦截</b>
-              <p>包为 ad-hoc 签名、未公证。右键选择“打开”，或在终端执行 <code>xattr -dr com.apple.quarantine ServerManager</code>。</p>
+            <div class="float-card how-float is-on" data-how-float="0">
+              <span class="float-icon emerald"><svg class="icon"><use href="#i-terminal"/></svg></span>
+              <div><strong>127.0.0.1:8787</strong><span>本地界面 · 已打开</span></div>
             </div>
-            <div class="side-item">
-              <b>没有服务器，也想先看看</b>
-              <p>Windows：<code>set SM_DEMO=1 &amp;&amp; ServerManager.exe</code>；macOS：<code>SM_DEMO=1 ./ServerManager</code>。会载入合成的服务器、GPU 与任务数据。</p>
+            <div class="float-card how-float" data-how-float="1">
+              <span class="float-icon blue"><svg class="icon"><use href="#i-server"/></svg></span>
+              <div><strong>3 台在线</strong><span>空闲 GPU 5 / 7</span></div>
             </div>
-            <div class="side-item">
-              <b>U 盘或便携使用</b>
-              <p>使用 <code>--portable</code>，数据会写在可执行文件同目录的 <code>data/</code>，连同程序一起带走。</p>
+            <div class="float-card how-float" data-how-float="2">
+              <span class="float-icon amber"><svg class="icon"><use href="#i-folder"/></svg></span>
+              <div><strong>蛋白质结构预测</strong><span>Target · A100 主训练</span></div>
             </div>
-            <div class="side-item">
-              <b>从源码运行</b>
-              <p><code>npm i &amp;&amp; npm run build &amp;&amp; npm start</code>，需要 Node.js 22.18 或更高版本。</p>
+            <div class="float-card how-float" data-how-float="3">
+              <span class="float-icon emerald"><svg class="icon"><use href="#i-sync"/></svg></span>
+              <div><strong>+2 / ~1</strong><span>dry-run 计划 · 待确认</span></div>
+            </div>
+            <div class="float-card how-float" data-how-float="4">
+              <span class="float-icon emerald"><svg class="icon"><use href="#i-bolt"/></svg></span>
+              <div><strong>24 个工具</strong><span>MCP · Agent 已接入</span></div>
             </div>
           </aside>
         </div>
       </div>
     </section>
 
-    <section class="section" id="download">
+    <!-- 04 下载 -->
+    <section class="slide" id="download" data-num="04" aria-labelledby="download-title">
       <div class="container">
-        <div class="download-card reveal">
+        <div class="download-card anim">
           <div class="download-glow" aria-hidden="true"></div>
           <div class="download-copy">
-            <p class="eyebrow"><span class="pulse-dot"></span>Windows / macOS 单文件 · 无需安装 Node.js</p>
-            <h2>把下一轮实验，<br />交给调度台。</h2>
+            <h2 id="download-title">把下一轮实验，<br />交给调度台。</h2>
             <p>不注册、不上传、不依赖云服务。选择你的系统，下载后即可连接第一台服务器。</p>
             <ul class="download-meta">
               <li><span>版本</span><b data-site-version>v0.1.1</b></li>
@@ -486,94 +322,69 @@
             </div>
             <p class="download-pending" data-download-pending>下载链接即将开放，发布后会在这里更新。</p>
             <p class="download-alt">macOS 包为 ad-hoc 签名，首次打开需右键“打开”。</p>
+            <p class="download-mcp">给 Agent 用：<a href="#download" data-download-platform="mcp">下载 MCP 服务包</a><span>约 0.1 MB · 需 Node.js 22.18+</span></p>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section" id="faq">
-      <div class="container narrow">
-        <div class="section-head reveal">
-          <p class="eyebrow">常见问题</p>
-          <h2>你可能想先确认的事</h2>
+    <!-- 05 常见问题 -->
+    <section class="slide slide-faq" id="faq" data-num="05" aria-labelledby="faq-title">
+      <div class="container">
+        <div class="slide-head">
+          <h2 id="faq-title" class="anim">你可能想先确认的事</h2>
         </div>
-        <div class="faq-list">
-          <details class="reveal">
-            <summary>会不会把我的代码、密码或日志传到别的地方？</summary>
-            <p>不会。应用只监听本机的 <code>127.0.0.1</code>，所有 SSH / SFTP / Git 操作都由你的电脑直接连接你的服务器。服务器密码与私钥使用 AES-256-GCM 加密后保存在本地数据目录，界面只显示“已保存”，不会回显明文。项目没有账号体系，也没有云端中转。</p>
-          </details>
-          <details class="reveal">
-            <summary>对远程服务器有什么要求？</summary>
-            <p>需要一台能 SSH 登录的 Linux 服务器，默认 shell 为 bash。推荐安装 tmux 或 screen（都没有时会退化为 nohup 后台进程）；nvidia-smi 与 git 都是可选项。首次连接会自动探测 <code>find</code>、<code>stat</code>、<code>tail</code> 等命令的能力，老系统会自动降级兼容。</p>
-          </details>
-          <details class="reveal">
-            <summary>和直接用 rsync / scp 有什么区别？</summary>
-            <p>传输前会给出 dry-run 计划，明确列出新增、更新、删除与被忽略的文件；写入使用临时文件 + rename 原子替换并保留 mtime；镜像删除默认关闭，开启后也需要输入目标名二次确认。还支持 A→B 中转同步，以及可选的 Git 中心仓库模式；Git 模式不会 force push，目标机工作区脏时零写入并中止。</p>
-          </details>
-          <details class="reveal">
-            <summary>断网或关掉软件，任务会停吗？</summary>
-            <p>不会。任务运行在远程的 tmux / screen 会话或 nohup 后台进程中，SSH 断开不会影响它。重新打开软件后，任务状态与日志会继续同步；日志以字节偏移续传，断线重连不重复、不遗漏。</p>
-          </details>
-          <details class="reveal">
-            <summary>使用已有 tmux / screen 会话，会不会误关我的会话？</summary>
-            <p>不会主动关闭。默认行为是新建独立会话；选择已有会话时，只会在其中新开一个窗口，或在确认空闲后向已有窗口注入命令。停止任务只清理本工具创建的窗口与进程组，已有会话和窗口保持不变。</p>
-          </details>
-          <details class="reveal">
-            <summary>数据存放在哪里？换电脑怎么办？</summary>
-            <p>Windows 默认在 <code>%LOCALAPPDATA%\ServerManager\data</code>，macOS 默认在 <code>~/Library/Application Support/ServerManager/data</code>，包含数据库、密钥与临时文件；使用 <code>--portable</code> 时写在可执行文件同目录的 <code>data/</code>。迁移时复制整个数据目录即可，但请一并保留 <code>keys/</code>，否则已加密的凭据无法解密。</p>
-          </details>
-          <details class="reveal">
-            <summary>支持 macOS / Linux 吗？</summary>
-            <p>Windows x64 与 macOS（Apple Silicon / Intel）均提供单文件包；macOS 包为 ad-hoc 签名、未公证，首次打开需右键“打开”。Linux 可从源码构建运行。</p>
-          </details>
-          <details class="reveal">
-            <summary>MCP 是什么？怎么下载？</summary>
-            <p>MCP 是给 AI Agent 调用的可选接口，不是主程序的一部分，日常手动使用不需要它。它需要本地 Node.js 22.18+，并保持主程序在运行。下载 <a class="faq-link" href="#download" data-download-platform="mcp">ServerManager-mcp.zip</a>（约 0.1 MB）并解压到任意目录，然后在 MCP 客户端（Qoder / Claude Desktop 等）中注册：</p>
-            <pre class="faq-code">{
-  "mcpServers": {
-    "server-manager": {
-      "command": "node",
-      "args": ["/解压目录/ServerManager-mcp/index.js"],
-      "env": { "SM_MCP_BASE_URL": "http://127.0.0.1:8787" }
-    }
-  }
-}</pre>
-            <p>重启客户端后即可看到 24 个工具；工具默认 dry-run、只读凭据、不触碰已有会话。完整说明见压缩包内 README。</p>
-          </details>
+
+        <div class="faq-grid anim">
+          <div class="faq-list">
+            <details>
+              <summary>会不会把代码、密码或日志传到别的地方？</summary>
+              <p>不会。应用只监听本机 <code>127.0.0.1</code>，SSH / SFTP / Git 都由你的电脑直连服务器。密码与私钥使用 AES-256-GCM 加密后保存在本地，界面只显示“已保存”，不会回显明文。没有账号体系，也没有云端中转。</p>
+            </details>
+            <details>
+              <summary>对远程服务器有什么要求？</summary>
+              <p>一台能 SSH 登录的 Linux 服务器，默认 shell 为 bash。推荐安装 tmux 或 screen（缺失时退化为 nohup 后台进程）；nvidia-smi 与 git 都是可选项。首次连接会自动探测命令能力，老系统自动降级兼容。</p>
+            </details>
+            <details>
+              <summary>断网或关掉软件，任务会停吗？</summary>
+              <p>不会。任务运行在远端的 tmux / screen 会话或 nohup 后台进程中，SSH 断开不影响它。重新打开软件后，任务状态与日志继续同步；日志以字节偏移续传，不重复、不遗漏。</p>
+            </details>
+            <details>
+              <summary>使用已有 tmux / screen 会话，会误关我的会话吗？</summary>
+              <p>不会主动关闭。默认新建独立会话；选择已有会话时，只会在其中新开窗口，或确认空闲后注入命令。停止任务只清理本工具创建的窗口与进程组。</p>
+            </details>
+          </div>
+          <div class="faq-list">
+            <details>
+              <summary>数据存放在哪里？换电脑怎么办？</summary>
+              <p>Windows 默认在 <code>%LOCALAPPDATA%\ServerManager\data</code>，macOS 在 <code>~/Library/Application Support/ServerManager/data</code>；<code>--portable</code> 时写在程序同目录。迁移时复制整个数据目录，并保留 <code>keys/</code>，否则已加密的凭据无法解密。</p>
+            </details>
+            <details>
+              <summary>支持 macOS / Linux 吗？</summary>
+              <p>Windows x64 与 macOS（Apple Silicon / Intel）均提供单文件包；macOS 包未公证，首次打开方式见下载区说明。Linux 可从源码构建运行。</p>
+            </details>
+            <details>
+              <summary>MCP 是什么？怎么接给 Agent？</summary>
+              <p>给 AI Agent 调用的可选接口，需要本地 Node.js 22.18+ 且主程序在运行。下载 <a class="faq-link" href="#download" data-download-platform="mcp">ServerManager-mcp.zip</a> 解压后，在 Qoder / Claude Desktop 等客户端注册解压目录中的 <code>index.js</code>，完整配置示例见压缩包内 README。工具默认 dry-run、只读凭据、不触碰已有会话。</p>
+            </details>
+          </div>
+        </div>
+
+        <div class="deck-foot anim">
+          <span>© <span data-year>2026</span> Server Manager · 本地运行 · 数据不出本机</span>
+          <a href="#what">回到顶部 ↑</a>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-brand">
-        <a class="brand" href="#top">
-          <span class="brand-mark"><svg class="icon"><use href="#i-bolt"/></svg></span>
-          <span class="brand-text">科研 GPU 调度台<small>SERVER MANAGER</small></span>
-        </a>
-        <p>为每天和 SSH、conda、tmux 打交道的科研人而做。</p>
-      </div>
-      <nav class="footer-nav" aria-label="页脚导航">
-        <a href="#features">功能</a>
-        <a href="#agent">Agent</a>
-        <a href="#interface">界面</a>
-        <a href="#guide">使用指南</a>
-        <a href="#faq">常见问题</a>
-        <a href="#download">下载</a>
-      </nav>
-    </div>
-    <div class="container footer-bottom">
-      <span>© <span data-year>2026</span> Server Manager</span>
-      <span>本地运行 · 数据不出本机</span>
-    </div>
-  </footer>
-
-  <dialog class="lightbox" id="lightbox" aria-label="界面截图预览">
-    <button class="lightbox-close" type="button" aria-label="关闭预览"><svg class="icon"><use href="#i-close"/></svg></button>
-    <img alt="" />
-    <p></p>
-  </dialog>
+  <nav class="deck-nav" aria-label="章节快捷导航">
+    <button type="button" data-slide-link="what" aria-label="是什么" title="是什么"><span class="deck-label">是什么</span><span class="deck-dot"></span></button>
+    <button type="button" data-slide-link="why" aria-label="为什么" title="为什么"><span class="deck-label">为什么</span><span class="deck-dot"></span></button>
+    <button type="button" data-slide-link="how" aria-label="怎么用" title="怎么用"><span class="deck-label">怎么用</span><span class="deck-dot"></span></button>
+    <button type="button" data-slide-link="download" aria-label="下载" title="下载"><span class="deck-label">下载</span><span class="deck-dot"></span></button>
+    <button type="button" data-slide-link="faq" aria-label="常见问题" title="常见问题"><span class="deck-label">常见问题</span><span class="deck-dot"></span></button>
+  </nav>
 
   <script src="config.js"></script>
   <script src="site.js"></script>
